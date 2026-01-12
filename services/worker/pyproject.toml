@@ -1,0 +1,14 @@
+[project]
+name = "media-processor-worker"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "google-cloud-pubsub",
+    "google-cloud-firestore",
+    "ffmpeg-python",
+    "pydantic>=2.0.0",
+    "resilient-commons"
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true

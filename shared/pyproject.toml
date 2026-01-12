@@ -1,0 +1,12 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "resilient-commons"
+version = "0.1.0"
+description = "Shared protocols and utilities"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.0.0"
+]
