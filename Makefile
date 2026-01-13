@@ -1,4 +1,8 @@
-.PHONY: dev-api dev-worker build-api build-worker check format
+# Load environment variables from .env.local
+-include .env.local
+export
+
+.PHONY: dev-api dev-worker build-api build-worker check format tf-init tf-plan tf-apply tf-destroy tf-output
 
 # ==============================================================================
 # Local Development (Relies on .venv)
@@ -48,3 +52,22 @@ build-frontend:
 
 run-frontend:
 	docker run -p 3000:80 resilient-frontend
+
+# ==============================================================================
+# Infrastructure (Terraform)
+# ==============================================================================
+
+tf-init:
+	cd infra && terraform init
+
+tf-plan:
+	cd infra && terraform plan -var="project_id=$(PROJECT_ID)"
+
+tf-apply:
+	cd infra && terraform apply -auto-approve -var="project_id=$(PROJECT_ID)"
+
+tf-destroy:
+	cd infra && terraform destroy -auto-approve -var="project_id=$(PROJECT_ID)"
+
+tf-output:
+	cd infra && terraform output
