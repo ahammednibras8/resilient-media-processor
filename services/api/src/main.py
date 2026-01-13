@@ -6,11 +6,21 @@ import uuid
 from datetime import datetime, timezone
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from resilient_commons import JobCreateRequest, JobResponse, JobRecord, JobStatus
 from .dependencies import get_firestore_client, get_bucket, get_settings
 
 app = FastAPI(title="Resilient Media Processor API")
+
+# CORS: Allow frontend to call API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/v1/jobs", response_model=JobResponse)

@@ -1,7 +1,7 @@
-import { ComponentExample } from "@/components/component-example";
+import Upload from "./pages/Upload";
 
 export function App() {
-return <ComponentExample />;
+    return <Upload />
 }
 
 export default App;
