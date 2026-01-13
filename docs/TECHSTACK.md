@@ -61,7 +61,21 @@ technology** that fails safely over bleeding-edge complexity.
 ## 7. Contract Sharing: Pydantic v2
 
 - **Role**: Defining the "Shape" of messages between API and Worker.
-- **Rationale**:
-  - **Single Source of Truth**: Shared library (`services/shared`) ensures the
-    Producer (API) and Consumer (Worker) never disagree on what a "Job" looks
-    like.
+- **Single Source of Truth**: Shared library (`services/shared`) ensures the
+  Producer (API) and Consumer (Worker) never disagree on what a "Job" looks
+  like.
+
+## 8. Frontend: The Visualization Layer
+
+- **Framework**: **Vite + React (TypeScript)**
+  - **Rationale**: We need a lightweight Single Page Application (SPA) to
+    visualize the async flow. Next.js is overkill; we don't need SEO or Server
+    Rendering.
+- **State Management**: **TanStack Query (React Query)**
+  - **Rationale**: The **Best** tool for polling. Since our backend is async,
+    the Frontend needs to ping `GET /jobs/{id}` every few seconds. React Query
+    handles this ("auto-refetching") effortlessly while managing loading/error
+    states.
+- **Styling**: **TailwindCSS**
+  - **Rationale**: Rapid UI development to make the dashboard look "Premium"
+    without writing custom CSS files.

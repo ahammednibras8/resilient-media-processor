@@ -35,3 +35,16 @@ check:
 
 format:
 	ruff format services shared
+
+# ==============================================================================
+# Frontend
+# ==============================================================================
+
+dev-frontend:
+	cd services/frontend && npm run dev
+
+build-frontend:
+	docker build -t resilient-frontend services/frontend
+
+run-frontend:
+	docker run -p 3000:80 resilient-frontend
