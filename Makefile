@@ -2,7 +2,22 @@
 -include .env.local
 export
 
-.PHONY: dev-api dev-worker build-api build-worker check format tf-init tf-plan tf-apply tf-destroy tf-output
+.PHONY: dev-api dev-worker build-api build-worker check format tf-init tf-plan tf-apply tf-destroy tf-output setup install-backend install-frontend
+
+# ==============================================================================
+# Setup (Run once after cloning)
+# ==============================================================================
+
+setup: install-backend install-frontend tf-init
+	@echo "✅ Setup complete!"
+
+install-backend:
+	python -m venv .venv
+	. .venv/bin/activate && pip install -e shared/
+	. .venv/bin/activate && pip install -r services/api/requirements.txt 2>/dev/null || echo "No requirements.txt yet"
+
+install-frontend:
+	cd services/frontend && npm install
 
 # ==============================================================================
 # Local Development (Relies on .venv)
