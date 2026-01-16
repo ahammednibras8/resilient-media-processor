@@ -70,19 +70,20 @@ run-frontend:
 
 # ==============================================================================
 # Infrastructure (Terraform)
+# Uses gcloud user credentials, NOT service account
 # ==============================================================================
 
 tf-init:
-	cd infra && terraform init
+	cd infra && unset GOOGLE_APPLICATION_CREDENTIALS && terraform init
 
 tf-plan:
-	cd infra && terraform plan -var="project_id=$(PROJECT_ID)"
+	cd infra && unset GOOGLE_APPLICATION_CREDENTIALS && terraform plan -var="project_id=$(PROJECT_ID)"
 
 tf-apply:
-	cd infra && terraform apply -auto-approve -var="project_id=$(PROJECT_ID)"
+	cd infra && unset GOOGLE_APPLICATION_CREDENTIALS && terraform apply -auto-approve -var="project_id=$(PROJECT_ID)"
 
 tf-destroy:
-	cd infra && terraform destroy -auto-approve -var="project_id=$(PROJECT_ID)"
+	cd infra && unset GOOGLE_APPLICATION_CREDENTIALS && terraform destroy -auto-approve -var="project_id=$(PROJECT_ID)"
 
 tf-output:
-	cd infra && terraform output
+	cd infra && unset GOOGLE_APPLICATION_CREDENTIALS && terraform output

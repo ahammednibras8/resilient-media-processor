@@ -133,3 +133,74 @@ output "firestore_database" {
   value       = google_firestore_database.main.name
   description = "The name of the Firestore database"
 }
+
+# Feature 02: The Conveyor Belt (Pub/Sub + GCS Notification)
+
+# Enable Pub/Sub API
+resource "google_project_service" "pubsub" {
+  project            = var.project_id
+  service            = "pubsub.googleapis.com"
+  disable_on_destroy = false
+}
+
+# The Conveyor Belt Queue
+resource "google_pubsub_topic" "jobs" {
+  name    = "video-processing-jobs"
+  project = var.project_id
+
+  depends_on = [google_project_service.pubsub]
+}
+
+# Workers Pull From Here
+resource "google_pubsub_subscription" "workers" {
+  name    = "video-processing-workers"
+  topic   = google_pubsub_topic.jobs.id
+  project = var.project_id
+
+  ack_deadline_seconds       = 600       # 10 Minutes
+  message_retention_duration = "604800s" # 7 Days
+
+  # Retry with exponential backoff
+  retry_policy {
+    minimum_backoff = "10s"
+    maximum_backoff = "600s"
+  }
+
+  depends_on = [google_pubsub_topic.jobs]
+}
+
+# GCS → Pub/Sub Bridge (triggers when file uploaded)
+resource "google_storage_notification" "upload_trigger" {
+  bucket         = google_storage_bucket.uploads.name
+  payload_format = "JSON_API_V1"
+  topic          = google_pubsub_topic.jobs.id
+  event_types    = ["OBJECT_FINALIZE"]
+
+  depends_on = [
+    google_pubsub_topic.jobs,
+    google_pubsub_topic_iam_member.gcs_publisher
+  ]
+}
+
+# Allow GCS to publish to Pub/Sub
+data "google_storage_project_service_account" "gcs_account" {
+  project = var.project_id
+}
+
+resource "google_pubsub_topic_iam_member" "gcs_publisher" {
+  topic   = google_pubsub_topic.jobs.id
+  role    = "roles/pubsub.publisher"
+  member  = "serviceAccount:${data.google_storage_project_service_account.gcs_account.email_address}"
+  project = var.project_id
+}
+
+# Feature 02 Outputs
+output "pubsub_topic" {
+  value       = google_pubsub_topic.jobs.name
+  description = "The Pub/Sub topic for job messages"
+}
+
+output "pubsub_subscription" {
+  value       = google_pubsub_subscription.workers.name
+  description = "The Pub/Sub subscription for workers"
+}
