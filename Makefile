@@ -12,7 +12,7 @@ setup: install-backend install-frontend tf-init
 	@echo "✅ Setup complete!"
 
 install-backend:
-	python -m venv .venv
+	python3 -m venv .venv
 	. .venv/bin/activate && pip install -e shared/
 	. .venv/bin/activate && pip install -r services/api/requirements.txt 2>/dev/null || echo "No requirements.txt yet"
 
@@ -25,7 +25,7 @@ install-frontend:
 
 dev-api:
 	# Runs the API locally using the code in .venv
-	uvicorn services.api.src.main:app --reload --port 8080
+	.venv/bin/uvicorn services.api.src.main:app --reload --port 8080
 
 dev-worker:
 	# Runs the worker logic locally
