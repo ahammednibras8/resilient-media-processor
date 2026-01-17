@@ -82,3 +82,30 @@ def get_job_status(job_id: str):
         raise HTTPException(status_code=404, detail="Job not found")
 
     return doc.to_dict()
+
+
+@app.post("/v1/jobs/{job_id}/confirm", response_model=JobResponse)
+def confirm_job(job_id: str):
+    """
+    Confirm that a file has been uploaded to GCS.
+    Updates status to QUEUED.
+    """
+    db = get_firestore_client()
+    doc_ref = db.collection("jobs").document(job_id)
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Update status
+    doc_ref.update({"status": JobStatus.QUEUED})
+
+    # Get updated doc
+    job_data = doc_ref.get().to_dict()
+
+    return JobResponse(
+        job_id=job_data["job_id"],
+        upload_url="",
+        status=job_data["status"],
+        created_at=job_data["created_at"],
+    )
